@@ -11,9 +11,12 @@ const methodOverride = require('method-override');
 app.use(express.urlencoded({ extended: true}));
 app.use(methodOverride('_method'));
 
+// talk about templates
 app.set("view engine", "ejs");
+// handle the routes during switch different API's
 app.set("views",path.join(__dirname, "views"));
 
+// we can run from parent directory of public files without any error..
 app.use(express.static(path.join(__dirname, "public")));
 
 // routings
