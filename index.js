@@ -1,102 +1,95 @@
 const express = require("express");
 const app = express();
-const port = 8080;
-// reuire path like a views, public
+const port = process.env.PORT || 8080; // Use Render's PORT if available
 const path = require("path");
-// automatically add new id for adding new posting
-const { v4: uuidv4 } = require('uuid');
-// Method Override
-const methodOverride = require('method-override');
+const { v4: uuidv4 } = require("uuid");
+const methodOverride = require("method-override");
 
-app.use(express.urlencoded({ extended: true}));
-app.use(methodOverride('_method'));
-
-// talk about templates
-app.set("view engine", "ejs");
-// handle the routes during switch different API's
-app.set("views",path.join(__dirname, "views"));
-
-// we can run from parent directory of public files without any error..
-app.use(express.static(path.join(__dirname, "public")));
-
-// routings
-
-app.get("/posts", (req,res) => {
-    res.render("index.ejs", { posts });
-});
-
-app.get("/posts/new",(req,res) => {
-    res.render("new.ejs");
-});
-
-app.post("/posts",(req,res) => {
-    let {username, content} = req.body;
-    let id = uuidv4();
-    posts.push({id, username, content})
-    res.redirect("/posts"); // this method is directly redirect to the posts page after Add new users
-});
-
-app.get("/posts/:id",(req,res) => {
-    let {id} = req.params; //to get id
-    console.log(id);
-    let post = posts.find((p) => id === p.id);
-    res.render("show.ejs",{post});
-    // console.log(post);
-});
-
-app.patch("/posts/:id", (req,res) => {
-    let {id} = req.params;
-    let newContent = req.body.content;
-    let post = posts.find((p) => id === p.id);
-    post.content = newContent;
-    // console.log(post);
-    res.redirect("/posts");
-});
- 
-app.get("/posts/:id/edit", (req,res) => {
-    let { id } = req.params;
-    let post = posts.find((p) => id === p.id);
-    res.render("edit.ejs", { post });
-});
-
-app.delete("/posts/:id",(req,res) => {
-    let { id } = req.params;
-     posts = posts.filter((p) => id !== p.id);
-    res.redirect("/posts");
-})
-
-// create a Posts because here we aren't used dadabase thats why it works similer to work like database
-
+// Fake in-memory database
 let posts = [
-    {
-        id : uuidv4(), // give random id at a time
-        username : "Peter Parker",
-        content : "I love coding!"
-    },
-    {
-        id : uuidv4(),
-        username : "Archit Mathur",
-        content : "I love to Connect Defferent People!"
-    },
-    {
-        id : uuidv4(),
-        username : "Harsh Pareek",
-        content : "I love to enjoy my life!"
-    },
-    {
-        id : uuidv4(),
-        username : "Ankit Mena",
-        content : "I love Body Building!"
-    },
-    {
-        id : uuidv4(),
-        username : "Marvel",
-        content : "Can be Achieve anything if you really want that!"
-    },
+  {
+    id: uuidv4(),
+    username: "Peter Parker",
+    content: "I love coding!"
+  },
+  {
+    id: uuidv4(),
+    username: "Archit Mathur",
+    content: "I love to Connect Different People!"
+  },
+  {
+    id: uuidv4(),
+    username: "Harsh Pareek",
+    content: "I love to enjoy my life!"
+  },
+  {
+    id: uuidv4(),
+    username: "Ankit Mena",
+    content: "I love Body Building!"
+  },
+  {
+    id: uuidv4(),
+    username: "Marvel",
+    content: "Can achieve anything if you really want that!"
+  }
 ];
 
+// Middleware
+app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride("_method"));
+app.use(express.static(path.join(__dirname, "public")));
 
+// Template engine setup
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Routes
+app.get("/", (req, res) => {
+  res.redirect("/posts"); // Redirect homepage to posts
+});
+
+app.get("/posts", (req, res) => {
+  res.render("index.ejs", { posts });
+});
+
+app.get("/posts/new", (req, res) => {
+  res.render("new.ejs");
+});
+
+app.post("/posts", (req, res) => {
+  let { username, content } = req.body;
+  let id = uuidv4();
+  posts.push({ id, username, content });
+  res.redirect("/posts");
+});
+
+app.get("/posts/:id", (req, res) => {
+  let { id } = req.params;
+  let post = posts.find((p) => id === p.id);
+  res.render("show.ejs", { post });
+});
+
+app.get("/posts/:id/edit", (req, res) => {
+  let { id } = req.params;
+  let post = posts.find((p) => id === p.id);
+  res.render("edit.ejs", { post });
+});
+
+app.patch("/posts/:id", (req, res) => {
+  let { id } = req.params;
+  let newContent = req.body.content;
+  let post = posts.find((p) => id === p.id);
+  post.content = newContent;
+  res.redirect("/posts");
+});
+
+app.delete("/posts/:id", (req, res) => {
+  let { id } = req.params;
+  posts = posts.filter((p) => id !== p.id);
+  res.redirect("/posts");
+});
+
+// Start server
 app.listen(port, () => {
-    console.log(`listening on port: ${port}`);
-})
-
+  console.log(`Listening on port ${port}`);
+});
